@@ -1,0 +1,15 @@
+name: Deploy dev
+on:
+  push:
+    branches: [ "main" ]
+
+
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+      - name: Check out repo's default branch
+        uses: actions/checkout@main
+
+
+      - run: docker build -t api:$GITHUB_REF_NAME .
