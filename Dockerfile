@@ -9,6 +9,7 @@ RUN apk add --no-cache --virtual .build-deps \
     postgresql-dev \
     && pip install -r /requirements.txt \
     && apk del --no-cache .build-deps \
+    && apk --no-cache add libpq \
     && mkdir /app
 
 COPY manage.py /app/
@@ -16,3 +17,4 @@ COPY api /app/api
 COPY stihtok /app/stihtok
 
 WORKDIR /app
+
