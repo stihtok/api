@@ -1,6 +1,7 @@
 FROM python:3.11.2-alpine
 
 COPY requirements.txt /
+COPY entrypoint.sh /
 
 RUN apk add --no-cache --virtual .build-deps \
     gcc \
@@ -17,4 +18,6 @@ COPY api /app/api
 COPY stihtok /app/stihtok
 
 WORKDIR /app
+RUN python manage.py makemigrations
 
+CMD ["/entrypoint.sh"]
