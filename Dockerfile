@@ -14,3 +14,5 @@ RUN apk add --no-cache --virtual .build-deps \
 COPY manage.py /app/
 COPY api /app/api
 COPY stihtok /app/stihtok
+
+WORKDIR /app
