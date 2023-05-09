@@ -18,6 +18,5 @@ COPY api /app/api
 COPY stihtok /app/stihtok
 
 WORKDIR /app
-RUN python manage.py makemigrations
 
 CMD ["/entrypoint.sh"]
