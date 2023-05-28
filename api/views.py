@@ -9,6 +9,7 @@ from .serializers import StihSerializer, AuthorSerializer
 from django.http import HttpResponse
 from rest_framework.exceptions import APIException
 import random
+from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
 
 
 
@@ -107,3 +108,14 @@ def getAuthorById(request, id):
         return Response(serializer.data)
     except:
         raise APIException('getAuthorById error')
+    
+@api_view(["GET"])
+def search(request, searchString):
+    try:
+        vector = SearchVector("body", "title", "epigraph")
+        query = SearchQuery(searchString, search_type="phrase")
+        stihSearch = Stih.objects.annotate(search=vector).filter(search=query)
+        serializer = StihSerializer(stihSearch, many=True)
+        return Response(serializer.data)
+    except:
+        raise APIException('Search error')

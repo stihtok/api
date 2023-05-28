@@ -10,4 +10,5 @@ urlpatterns = [
     path("author/<int:id>/all", views.getAllStihByAuthorId, name="AllStihByAuthorId"),
     path("year/<int:year>/all", views.getAllStihByYear, name="AllStihByYear"),
     path("authors/", views.getAuthors, name="Authors"),
+    path("search/<str:searchString>", views.search, name="Search"),
 ]
