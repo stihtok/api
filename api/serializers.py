@@ -6,7 +6,7 @@ from rest_framework import serializers
 class AuthorSerializer(ModelSerializer):
     class Meta:
         model = Author
-        fields = ['name', 'photo', 'id']
+        fields = ['name', 'photo', 'id', 'description']
 
 
 class StihSerializer(ModelSerializer):

@@ -5,7 +5,7 @@ from random import randint
 class Author(models.Model):
     name = models.CharField(max_length=100, default=None)
     photo = models.ImageField(upload_to='pics', default=None, blank=True)
-    description = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True, null=False)
 
     def __str__(self):
         return self.name
