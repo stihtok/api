@@ -22,6 +22,7 @@ class Stih(models.Model):
     epigraph =  models.CharField("Epigraph", max_length=1000, blank=True)
     body = models.TextField(blank=True, null=True)
     createdAt = models.CharField("Created At", max_length=255, blank=True)
+    likes = models.IntegerField(default=0)
     objects = StihManager()
 
 
