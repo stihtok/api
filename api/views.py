@@ -10,7 +10,7 @@ from django.http import HttpResponse
 from rest_framework.exceptions import APIException
 import random
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
-
+from django.db.models import F
 
 
 @api_view(["GET"])
@@ -33,6 +33,22 @@ def getStihById(request, id):
         return Response(serializer.data)
     except:
         raise APIException('getStihById error')
+    
+@api_view(["GET"])
+def stihLike(request, id):
+    try:
+        Stih.objects.filter(pk=id).update(likes=F('likes') + 1)
+        return HttpResponse(status=200)
+    except:
+        raise APIException('Like error')
+    
+@api_view(["GET"])
+def stihDislike(request, id):
+    try:
+        Stih.objects.filter(pk=id).update(likes=F('likes') - 1)
+        return HttpResponse(status=200)
+    except:
+        raise APIException('Dislike error')
 
 @api_view(["GET"])
 def getStihBundle(request):
