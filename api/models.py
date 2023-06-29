@@ -19,7 +19,7 @@ class StihManager(models.Manager):
 class Stih(models.Model):
     author = models.ForeignKey(Author, on_delete=models.CASCADE,  default=None)
     title = models.CharField("Stih title", max_length=1000, blank=True)
-    epigraph =  models.CharField("Epigraph", max_length=1000, blank=True)
+    epigraph =  models.TextField("Epigraph", blank=True)
     body = models.TextField(blank=True, null=True)
     createdAt = models.CharField("Created At", max_length=255, blank=True)
     likes = models.IntegerField(default=0)
