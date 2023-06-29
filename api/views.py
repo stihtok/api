@@ -131,7 +131,10 @@ def search(request, searchString):
         vector = SearchVector("body", "title", "epigraph")
         query = SearchQuery(searchString, search_type="phrase")
         stihSearch = Stih.objects.annotate(search=vector).filter(search=query)
-        serializer = StihSerializer(stihSearch, many=True)
-        return Response(serializer.data)
+        authorSearch = Author.objects.filter(name__search=searchString)
+        authorSerializer = AuthorSerializer(authorSearch, many=True)
+        stihSerializer = StihSerializer(stihSearch, many=True)
+        data = authorSerializer.data + stihSerializer.data
+        return Response(data)
     except:
         raise APIException('Search error')
