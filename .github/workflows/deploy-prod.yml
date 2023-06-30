@@ -11,7 +11,7 @@ jobs:
       - name: Check out repo's default branch
         uses: actions/checkout@main
         with:
-            ref: $GITHUB_REF_NAME
+            ref: "$GITHUB_REF_NAME"
 
 
       - run: docker build -t api:$GITHUB_REF_NAME .
