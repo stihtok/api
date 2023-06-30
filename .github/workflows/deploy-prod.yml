@@ -1,0 +1,17 @@
+name: Deploy prod
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+      - name: Check out repo's default branch
+        uses: actions/checkout@main
+        with:
+            ref: $GITHUB_REF_NAME
+
+
+      - run: docker build -t api:$GITHUB_REF_NAME .
