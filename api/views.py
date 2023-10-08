@@ -62,11 +62,20 @@ def getStihBundle(request):
 @api_view(["GET"])
 def getAllStihByAuthorId(request, id):
     try:
-        stih_objects = Stih.objects.all().filter(author__id=id)
+        stih_objects = Stih.objects.order_by("-likes", "createdAt").all().filter(author__id=id)
         serializer = StihSerializer(stih_objects, many=True)
         return Response(serializer.data)
     except:
         raise APIException('getAllStihByAuthorId error')
+    
+@api_view(["GET"])
+def getAllStihByAuthorIdRandom(request, id):
+    try:
+        stih_objects = Stih.objects.order_by("?").all().filter(author__id=id)
+        serializer = StihSerializer(stih_objects, many=True)
+        return Response(serializer.data)
+    except:
+        raise APIException('getAllStihByAuthorIdRandom error')
 
 
 # [

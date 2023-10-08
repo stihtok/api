@@ -10,6 +10,7 @@ urlpatterns = [
     path("bundle/", views.getStihBundle, name="StihBundle"),
     path("author/<int:id>", views.getAuthorById, name="AuthorById"),
     path("author/<int:id>/all", views.getAllStihByAuthorId, name="AllStihByAuthorId"),
+    path("author/<int:id>/all/random", views.getAllStihByAuthorIdRandom, name="AllStihByAuthorIdRandom"),
     path("year/<int:year>/all", views.getAllStihByYear, name="AllStihByYear"),
     path("authors/", views.getAuthors, name="Authors"),
     path("search/<str:searchString>", views.search, name="Search"),
