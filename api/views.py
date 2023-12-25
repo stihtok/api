@@ -77,31 +77,6 @@ def getAllStihByAuthorIdRandom(request, id):
     except:
         raise APIException('getAllStihByAuthorIdRandom error')
 
-
-# [
-#   {
-#     "name": "Иосиф Бродский",
-#     "photo": "/media/pics/MTE5NTU2MzE2MTY0ODgzOTc5.jpg",
-#     "id": 1
-#     "stihs": [
-#         {
-#             "title": "В твоих часах не только ход, но тишь...",
-#             "epigraph": "",
-#             "body": "В твоих часах не только ход, но тишь. \r\nПритом их путь лишен подобья круга. \r\nТак в ходиках: не только кот, но мышь; \r\nони живут, должно быть, друг для друга. \r\nДрожат, скребутся, путаются в днях. \r\nНо их возня, грызня и неизбывность \r\nпочти что незаметна в деревнях, \r\nгде вообще в домах роится живность. \r\nТам каждый час стирается в уме, \r\nи лет былых бесплотные фигуры \r\nтеряются – особенно к зиме, \r\nкогда в сенях толпятся козы, овцы, \r\n     куры.",
-#             "createdAt": "1963 г.",
-#             "id": 11
-#         },
-#         {
-#             "title": "В твоих часах не только ход, но тишь...",
-#             "epigraph": "",
-#             "body": "В твоих часах не только ход, но тишь. \r\nПритом их путь лишен подобья круга. \r\nТак в ходиках: не только кот, но мышь; \r\nони живут, должно быть, друг для друга. \r\nДрожат, скребутся, путаются в днях. \r\nНо их возня, грызня и неизбывность \r\nпочти что незаметна в деревнях, \r\nгде вообще в домах роится живность. \r\nТам каждый час стирается в уме, \r\nи лет былых бесплотные фигуры \r\nтеряются – особенно к зиме, \r\nкогда в сенях толпятся козы, овцы, \r\n     куры.",
-#             "createdAt": "1963 г.",
-#             "id": 11
-#         }
-#     ]
-#   }
-# ]
-
 @api_view(["GET"])
 def getAllStihByYear(request, year):
     try:
@@ -121,7 +96,7 @@ def getAllStihByYear(request, year):
 
 @api_view(["GET"])
 def getAuthors(request):
-    authors = Author.objects.all()
+    authors = Author.objects.all().order_by("?")
     serializer = AuthorSerializer(authors, many=True)
     return Response(serializer.data)
 
