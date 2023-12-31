@@ -54,7 +54,7 @@ def stihDislike(request, id):
 def getStihBundle(request):
     stih_pks = Stih.objects.values_list('pk', flat=True)
     selected_pks = random.sample(list(stih_pks), 10)
-    stih_objects = Stih.objects.filter(pk__in=selected_pks).order_by('?')
+    stih_objects = Stih.objects.filter(pk__in=selected_pks)
     serializer = StihSerializer(stih_objects, many=True)
 
     return Response(serializer.data)
