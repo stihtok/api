@@ -1,5 +1,5 @@
 from django.shortcuts import render
-
+from random import shuffle
 from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -71,7 +71,8 @@ def getAllStihByAuthorId(request, id):
 @api_view(["GET"])
 def getAllStihByAuthorIdRandom(request, id):
     try:
-        stih_objects = Stih.objects.order_by("?").all().filter(author__id=id)
+        stih_objects = list(Stih.objects.all().filter(author__id=id))
+        shuffle(stih_objects)
         serializer = StihSerializer(stih_objects, many=True)
         return Response(serializer.data)
     except:
