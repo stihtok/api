@@ -12,8 +12,16 @@
             "args": [
                 "runserver", "0.0.0.0:8000"
             ],
-            "django": true,
-            "justMyCode": true
+            "env": {
+                "CSRF_TRUSTED_ORIGINS": "http://127.0.0.1 http://host.docker.internal:8000"
+                "DATABASE_PORT": "5432"
+                "DATABASE_HOST": "localhost"
+                "DATABASE_USER": "apidev"
+                "DATABASE_PASSWORD": "<DBPASSWORD>"
+                "DATABASE_NAME": "apilocal"
+                "SECRET_KEY": "stihtok"
+                "DEBUG": "true"
+            },
         }
     ]
 }
