@@ -4,14 +4,14 @@ from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from random import choice
-from .models import Stih, Author
-from .serializers import StihSerializer, AuthorSerializer
+from .models import Stih, Author, Tags
+from .serializers import StihSerializer, AuthorSerializer, TagsSerializer
 from django.http import HttpResponse
 from rest_framework.exceptions import APIException
 import random
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
 from django.db.models import F
-
+from django.db.models import Count
 
 @api_view(["GET"])
 def getRoutes(request):
@@ -101,6 +101,38 @@ def getAuthors(request):
     serializer = AuthorSerializer(authors, many=True)
     return Response(serializer.data)
 
+@api_view(["GET"])
+def getTags(request):
+    tags = Tags.objects.all().order_by("?")
+    serializer = TagsSerializer(tags, many=True)
+    return Response(serializer.data)
+
+@api_view(["GET"])
+def getStihsByTag(request,id):
+    stihsByTag = Stih.objects.filter(tags__id=id)
+    serializer = StihSerializer(stihsByTag, many=True)
+    return Response(serializer.data)
+
+@api_view(["GET"])
+def getStihsByQuery(request):
+    if "q" in request.GET:
+        params = request.GET.getlist("q")
+        if len(params) > 0:
+            pks = list(Stih.objects.values_list('pk', flat=True))
+            random.shuffle(pks)
+            all = Stih.objects.filter(pk__in=pks)
+            for q in params:
+                all = all.filter(tags__id=q)
+            serializer = StihSerializer(all, many=True)
+            return Response(serializer.data)
+    else:
+        stih_pks = Stih.objects.values_list('pk', flat=True)
+        selected_pks = random.sample(list(stih_pks), 10)
+        stih_objects = Stih.objects.filter(pk__in=selected_pks).order_by('?')
+        serializer = StihSerializer(stih_objects, many=True)
+
+    return Response(serializer.data)
+         
 @api_view(["GET"])
 def getAuthorById(request, id):
     try:

@@ -13,5 +13,8 @@ urlpatterns = [
     path("author/<int:id>/all/random", views.getAllStihByAuthorIdRandom, name="AllStihByAuthorIdRandom"),
     path("year/<int:year>/all", views.getAllStihByYear, name="AllStihByYear"),
     path("authors/", views.getAuthors, name="Authors"),
+    path("tags/", views.getTags, name="Tags"),
+    path("tags/<int:id>", views.getStihsByTag, name="Stihs by tag"),
+    path("tags/query", views.getStihsByQuery, name="Stihs by query"),
     path("search/<str:searchString>", views.search, name="Search"),
 ]

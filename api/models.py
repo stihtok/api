@@ -16,16 +16,18 @@ class StihManager(models.Manager):
         random_index = randint(0, count -1 )
         return self.all()[random_index]
 
+class Tags(models.Model):
+    title = models.CharField("Tag title", max_length=100)
+
+    def __str__(self):
+        return self.title
 class Stih(models.Model):
     author = models.ForeignKey(Author, on_delete=models.CASCADE,  default=None)
+    tags = models.ManyToManyField(Tags, blank=True)
     title = models.CharField("Stih title", max_length=1000, blank=True)
     epigraph =  models.TextField("Epigraph", blank=True)
     body = models.TextField(blank=True, null=True)
     createdAt = models.CharField("Created At", max_length=255, blank=True)
     likes = models.IntegerField(default=0)
     objects = StihManager()
-
-
-    def __str__(self):
-        return self.title
 
