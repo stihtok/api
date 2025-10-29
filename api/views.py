@@ -9,8 +9,8 @@ from .serializers import StihSerializer, AuthorSerializer, TagsSerializer
 from django.http import HttpResponse
 from rest_framework.exceptions import APIException
 import random
-from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
-from django.db.models import F
+from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector,TrigramSimilarity
+from django.db.models import F,Q
 from django.db.models import Count
 
 @api_view(["GET"])
@@ -144,14 +144,23 @@ def getAuthorById(request, id):
     
 @api_view(["GET"])
 def search(request, searchString):
-    try:
-        vector = SearchVector("body", "title", "epigraph")
-        query = SearchQuery(searchString, search_type="phrase")
-        stihSearch = Stih.objects.annotate(search=vector).filter(search=query)
-        authorSearch = Author.objects.filter(name__search=searchString)
+        stihSearch = (Stih.objects
+                      .annotate(
+                          search=SearchVector('title','body', 'epigraph'),
+                          trigram1=TrigramSimilarity('title', searchString),
+                          trigram2=TrigramSimilarity('body', searchString),
+                      )
+                      .filter(
+                          Q(search=SearchQuery(searchString)) |
+                          Q(title__icontains=searchString) |
+                          Q(body__icontains=searchString) |
+                          Q(trigram1__gt=0.2) |
+                          Q(trigram2__gt=0.2)
+                      )
+                      .order_by('-trigram1', '-trigram2')
+                      )
+        authorSearch = Author.objects.filter(name__icontains=searchString)
         authorSerializer = AuthorSerializer(authorSearch, many=True)
         stihSerializer = StihSerializer(stihSearch, many=True)
         data = authorSerializer.data + stihSerializer.data
         return Response(data)
-    except:
-        raise APIException('Search error')
