@@ -108,26 +108,49 @@ def getTags(request):
     return Response(serializer.data)
 
 @api_view(["GET"])
+def getTagsByAuthor(request,id):
+    try:
+        tagsList = Stih.objects.filter(author__id=id).values_list('tags__id', flat=True).distinct()
+        tags = Tags.objects.filter(id__in=tagsList)
+        serializer = TagsSerializer(tags, many=True)
+        return Response(serializer.data)
+    except:
+        raise APIException('getTagsByAuthorId error')
+
+    serializer = TagsSerializer(tags, many=True)
+    return Response(serializer.data)
+
+@api_view(["GET"])
 def getStihsByTag(request,id):
     stihsByTag = Stih.objects.filter(tags__id=id)
     serializer = StihSerializer(stihsByTag, many=True)
     return Response(serializer.data)
 
 @api_view(["GET"])
+def getStihsBundleByTag(request,id):
+    stih_pks = Stih.objects.filter(tags__id=id).values_list('pk', flat=True)
+    selected_pks = random.choices(list(stih_pks), k=10)
+    stih_objects = Stih.objects.filter(pk__in=selected_pks).order_by('?')
+    serializer = StihSerializer(stih_objects, many=True)
+
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
 def getStihsByQuery(request):
     if "q" in request.GET:
         params = request.GET.getlist("q")
         if len(params) > 0:
-            pks = list(Stih.objects.values_list('pk', flat=True))
-            random.shuffle(pks)
-            all = Stih.objects.filter(pk__in=pks)
+            all = Stih.objects.all()
             for q in params:
                 all = all.filter(tags__id=q)
-            serializer = StihSerializer(all, many=True)
+            allList=list(all)
+            random.shuffle(allList)
+            serializer = StihSerializer(allList, many=True)
             return Response(serializer.data)
     else:
         stih_pks = Stih.objects.values_list('pk', flat=True)
-        selected_pks = random.sample(list(stih_pks), 10)
+        selected_pks = random.choices(list(stih_pks), k=10)
         stih_objects = Stih.objects.filter(pk__in=selected_pks).order_by('?')
         serializer = StihSerializer(stih_objects, many=True)
 
