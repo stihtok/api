@@ -103,7 +103,7 @@ def getAuthors(request):
 
 @api_view(["GET"])
 def getTags(request):
-    tags = Tags.objects.all().order_by("?")
+    tags = Tags.objects.all().order_by('id')
     serializer = TagsSerializer(tags, many=True)
     return Response(serializer.data)
 
