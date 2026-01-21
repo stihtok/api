@@ -1,0 +1,70 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block title %}Импорт стихов из JSON{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+&rsaquo; <a href="{% url 'admin:api_stih_changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+&rsaquo; Импорт из JSON
+</div>
+{% endblock %}
+
+{% block content %}
+<h1>Импорт стихов из JSON файла</h1>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    
+    <fieldset class="module aligned">
+        <div class="form-row">
+            <div>
+                <label for="id_author">Автор по умолчанию:</label>
+                <select name="author_id" id="id_author">
+                    <option value="">---------</option>
+                    {% for author in authors %}
+                        <option value="{{ author.id }}">{{ author.name }}</option>
+                    {% endfor %}
+                </select>
+                <p class="help">Выберите автора по умолчанию для стихов, у которых в JSON нет author_id. Если в JSON есть author_id, будет использован он.</p>
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div>
+                <label for="id_json_file">JSON файл:</label>
+                <input type="file" name="json_file" id="id_json_file" accept=".json" required>
+                <p class="help">Выберите JSON файл со стихами. Формат: массив объектов с полями author_id (опционально), tag_ids (опционально), title, body, createdAt (опционально), epigraph (опционально), likes (опционально)</p>
+            </div>
+        </div>
+    </fieldset>
+    
+    <div class="submit-row">
+        <input type="submit" value="Импортировать" class="default">
+        <a href="{% url 'admin:api_stih_changelist' %}" class="button">Отмена</a>
+    </div>
+</form>
+
+<div style="margin-top: 20px; padding: 10px; background-color: #f0f0f0; border-radius: 5px;">
+    <h3>Формат JSON файла:</h3>
+    <pre style="background-color: white; padding: 10px; border-radius: 3px; overflow-x: auto;">[
+  {
+    "author_id": 1,
+    "tag_ids": [1, 2, 3],
+    "title": "Название стиха",
+    "body": "Текст стиха",
+    "createdAt": "2024",
+    "epigraph": "Эпиграф (опционально)",
+    "likes": 0
+  }
+]</pre>
+    <p><strong>Примечания:</strong></p>
+    <ul>
+        <li>Поле <code>author_id</code> опционально. Если оно отсутствует, будет использован автор по умолчанию из формы выше.</li>
+        <li>Поле <code>tag_ids</code> опционально. Должно быть массивом ID тегов. Если тег с указанным ID не найден, он будет пропущен.</li>
+    </ul>
+</div>
+{% endblock %}
+
