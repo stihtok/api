@@ -10,7 +10,7 @@ from django.http import HttpResponse
 from rest_framework.exceptions import APIException
 import random
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector,TrigramSimilarity
-from django.db.models import F,Q
+from django.db.models import F,Q, Case, When, IntegerField
 from django.db.models import Count
 
 @api_view(["GET"])
@@ -167,20 +167,35 @@ def getAuthorById(request, id):
     
 @api_view(["GET"])
 def search(request, searchString):
+        # Создаем SearchVector и SearchQuery для точного поиска
+        search_vector = SearchVector('title','body', 'epigraph')
+        search_query = SearchQuery(searchString)
+        
         stihSearch = (Stih.objects
                       .annotate(
-                          search=SearchVector('title','body', 'epigraph'),
+                          search=search_vector,
                           trigram1=TrigramSimilarity('title', searchString),
                           trigram2=TrigramSimilarity('body', searchString),
+                          # Приоритет: 1 для точных совпадений, 2 для триграмм
+                          match_priority=Case(
+                              When(
+                                  Q(search=search_query) | 
+                                  Q(title__icontains=searchString) | 
+                                  Q(body__icontains=searchString),
+                                  then=1
+                              ),
+                              default=2,
+                              output_field=IntegerField()
+                          )
                       )
                       .filter(
-                          Q(search=SearchQuery(searchString)) |
+                          Q(search=search_query) |
                           Q(title__icontains=searchString) |
                           Q(body__icontains=searchString) |
                           Q(trigram1__gt=0.2) |
                           Q(trigram2__gt=0.2)
                       )
-                      .order_by('-trigram1', '-trigram2')
+                      .order_by('match_priority', '-trigram1', '-trigram2')
                       )
         authorSearch = Author.objects.filter(name__icontains=searchString)
         authorSerializer = AuthorSerializer(authorSearch, many=True)
