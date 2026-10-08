@@ -167,36 +167,37 @@ def getAuthorById(request, id):
     
 @api_view(["GET"])
 def search(request, searchString):
-        # Создаем SearchVector и SearchQuery для точного поиска
-        search_vector = SearchVector('title','body', 'epigraph')
+        searchString = searchString.strip()
+        if not searchString:
+            return Response([])
+
+        search_vector = SearchVector('title', 'body', 'epigraph')
         search_query = SearchQuery(searchString)
-        
+        literal_match = (
+            Q(title__icontains=searchString) |
+            Q(body__icontains=searchString) |
+            Q(epigraph__icontains=searchString)
+        )
         stihSearch = (Stih.objects
-                      .annotate(
-                          search=search_vector,
-                          trigram1=TrigramSimilarity('title', searchString),
-                          trigram2=TrigramSimilarity('body', searchString),
-                          # Приоритет: 1 для точных совпадений, 2 для триграмм
-                          match_priority=Case(
-                              When(
-                                  Q(search=search_query) | 
-                                  Q(title__icontains=searchString) | 
-                                  Q(body__icontains=searchString),
-                                  then=1
-                              ),
-                              default=2,
-                              output_field=IntegerField()
-                          )
-                      )
-                      .filter(
-                          Q(search=search_query) |
-                          Q(title__icontains=searchString) |
-                          Q(body__icontains=searchString) |
-                          Q(trigram1__gt=0.2) |
-                          Q(trigram2__gt=0.2)
-                      )
-                      .order_by('match_priority', '-trigram1', '-trigram2')
-                      )
+                     .annotate(
+                         search=search_vector,
+                         trigram1=TrigramSimilarity('title', searchString),
+                         trigram2=TrigramSimilarity('body', searchString),
+                         match_priority=Case(
+                             When(title__iexact=searchString, then=0),
+                             When(literal_match, then=1),
+                             When(search=search_query, then=2),
+                             default=3,
+                             output_field=IntegerField()
+                         )
+                     )
+                     .filter(
+                         literal_match |
+                         Q(search=search_query) |
+                         Q(trigram1__gt=0.2) |
+                         Q(trigram2__gt=0.2)
+                     )
+                     .order_by('match_priority', '-trigram1', '-trigram2', 'pk'))
         authorSearch = Author.objects.filter(name__icontains=searchString)
         authorSerializer = AuthorSerializer(authorSearch, many=True)
         stihSerializer = StihSerializer(stihSearch, many=True)
